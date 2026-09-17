@@ -1,27 +1,8 @@
-"""Train an anomaly-segmentation network on Apple Silicon (MPS).
-
-Model: DeepLabV3 + ResNet-50 (ImageNet-pretrained backbone), 19 Cityscapes
-classes. Trained on Cityscapes; the segmentation and anomaly behaviour is
-learned here.
-
-Loss, on disjoint pixels:
-  (1) inlier  -- cross-entropy on the 19 known classes. Confident correct
-      predictions drive the anomaly score down on normal pixels.
-  (2) outlier -- on pasted unknown-object pixels, minimize sum_c tanh(logit_c),
-      pushing all class logits negative and the anomaly score up. This is
-      outlier exposure, and it optimizes the exact inference-time quantity:
-          anomaly = -sum_c tanh(logit_c).
-
-    PYTORCH_ENABLE_MPS_FALLBACK=1 python scripts/train_ood_segmenter.py \
-        --epochs 50 --batch-size 4 --crop 512
-Checkpoints land in checkpoints/ood_segmenter/. Safe to stop and --resume.
-"""
 from __future__ import annotations
 
 import os
 
-# Some ops aren't implemented for MPS yet; let them fall back to CPU instead of
-# crashing. Must be set before torch initializes the MPS backend.
+
 os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
 
 import argparse
@@ -53,8 +34,6 @@ def pick_device() -> torch.device:
 def build_model() -> torch.nn.Module:
     from torchvision.models.segmentation import deeplabv3_resnet50
 
-    # weights=None (train the seg heads), but load the ImageNet-pretrained
-    # backbone -- the standard starting point.
     model = deeplabv3_resnet50(
         weights=None, weights_backbone="IMAGENET1K_V2",
         num_classes=NUM_CLASSES, aux_loss=True,
@@ -66,7 +45,7 @@ def outlier_loss(logits: torch.Tensor, omask: torch.Tensor) -> torch.Tensor:
     """Push sum_c tanh(logit_c) DOWN on outlier pixels -> high anomaly score.
     logits: (B,C,H,W)  omask: (B,H,W) bool. Returns 0 if no outlier pixels."""
     if omask.sum() == 0:
-        return logits.sum() * 0.0  # keeps graph/device consistent, value 0
+        return logits.sum() * 0.0 
     tanh_sum = logits.tanh().sum(dim=1)  # (B,H,W)
     return tanh_sum[omask].mean()
 
@@ -129,7 +108,7 @@ def main():
 
     model = build_model().to(device)
 
-    # backbone gets 0.1x lr (pretrained), seg heads full lr
+
     backbone_params = list(model.backbone.parameters())
     head_params = [p for n, p in model.named_parameters() if not n.startswith("backbone.")]
     opt = torch.optim.SGD(
@@ -158,7 +137,7 @@ def main():
         run = {"ce": 0.0, "out": 0.0, "n": 0}
         for x, target, omask in train_ld:
             x, target, omask = x.to(device), target.to(device), omask.to(device)
-            # poly lr schedule
+
             lr_scale = (1 - it / max(total_iters, 1)) ** 0.9
             opt.param_groups[0]["lr"] = args.lr * 0.1 * lr_scale
             opt.param_groups[1]["lr"] = args.lr * lr_scale
@@ -182,7 +161,6 @@ def main():
                       f"ce={run['ce']/run['n']:.3f} out={run['out']/run['n']:.3f} "
                       f"lr={opt.param_groups[1]['lr']:.5f}")
 
-        # checkpoint every epoch (safe to stop/resume)
         torch.save({"model": model.state_dict(), "opt": opt.state_dict(),
                     "epoch": epoch, "args": vars(args)}, ckpt_last)
 
