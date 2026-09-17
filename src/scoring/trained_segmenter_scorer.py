@@ -1,12 +1,3 @@
-"""Anomaly scorer around the trained DeepLabV3 model.
-
-Same score(img, out_size) -> (rba_map, logits) interface as
-external/rba_official_scorer.py, so the evaluation harness runs unchanged with
-the trained weights in place of the downloaded checkpoint.
-
-Anomaly score matches the training objective:
-    anomaly = -sum_c tanh(logit_c)
-"""
 from __future__ import annotations
 
 import os

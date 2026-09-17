@@ -1,19 +1,3 @@
-"""Stereo ground-plane height for depth-gated anomaly detection.
-
-Uses Lost & Found's real stereo disparity instead of a monocular depth model.
-The dataset was recorded with a calibrated stereo rig (the same Daimler setup
-as Cityscapes), so depth comes from sensor geometry:
-
-    depth = focal_length * baseline / disparity
-
-Decodes the disparity map, back-projects to 3D with the rig's calibration,
-RANSAC-fits the road plane over predicted-road pixels, and measures height
-above it.
-
-The disparity PNG encoding is assumed to follow the Cityscapes convention and
-should be verified against a real file (run this module's __main__):
-    p == 0 -> invalid;  p > 0 -> disparity = (p - 1) / 256.0 pixels
-"""
 from __future__ import annotations
 
 from pathlib import Path

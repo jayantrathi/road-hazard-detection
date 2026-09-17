@@ -1,13 +1,4 @@
-"""Demo visuals for the trained anomaly segmenter + depth-gating.
 
-For each held-out Lost & Found hazard frame, renders a 3-panel strip:
-    [ input ] [ appearance anomaly ] [ depth-gated + alert boxes ]
-The raw model fires on the hazard and on some flat road paint; the gate
-suppresses the flat false positives; red boxes mark the surviving alerts and
-green outlines the ground-truth hazard. Also builds a contact sheet and a GIF.
-
-    PYTORCH_ENABLE_MPS_FALLBACK=1 python scripts/demo_trained_pipeline.py --n 10
-"""
 from __future__ import annotations
 
 import argparse
@@ -194,9 +185,6 @@ def main():
                            duration=900, loop=0)
         print(f"saved demo.gif")
     print(f"\nAll demo visuals in {OUT_DIR}")
-    print("LOOK at demo_00..09: the middle panel should show the raw model firing on")
-    print("both the hazard and some road paint; the right panel should show the paint")
-    print("suppressed and red boxes on the real hazard. That's the before/after story.")
 
 
 if __name__ == "__main__":

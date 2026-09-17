@@ -1,12 +1,3 @@
-"""OOD / anomaly-detection metrics.
-
-Accuracy is meaningless here: anomalies are rare, so a detector that flags
-nothing scores ~99%. The field uses ranking metrics that don't depend on a
-threshold, plus an operating-point analysis. These are what you report.
-
-Convention: higher score = more anomalous. Labels: 1 = anomaly (positive),
-0 = normal.
-"""
 from __future__ import annotations
 import numpy as np
 

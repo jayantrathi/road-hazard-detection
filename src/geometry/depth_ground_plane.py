@@ -1,17 +1,3 @@
-"""Ground-plane height estimation for depth-gated anomaly detection.
-
-Appearance-only anomaly detectors false-fire on flat road markings and manhole
-covers -- they look unusual but lie in the road plane, whereas a real obstacle
-protrudes from it. Estimating the road's 3D plane and each pixel's height above
-it separates the two: coplanar paint has height ~ 0, protruding obstacles do not.
-
-Pipeline:
-  1. Monocular depth from an off-the-shelf model (Depth Anything V2).
-  2. Back-project pixels to 3D with an assumed pinhole (focal from a nominal FOV).
-  3. RANSAC-fit the road plane over predicted-road pixels (no labels used).
-  4. height = |signed distance to the plane|, normalized by median road depth
-     to stay robust to monocular depth's unknown global scale.
-"""
 from __future__ import annotations
 
 import os
@@ -32,6 +18,7 @@ def _pick_device() -> str:
 
 
 class GroundPlaneHeight:
+    # flat road markings/manholes end up ~0 here, real obstacles don't -- that's the gate
     def __init__(
         self,
         model_name: str = "depth-anything/Depth-Anything-V2-Small-hf",
