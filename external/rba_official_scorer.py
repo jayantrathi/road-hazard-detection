@@ -1,32 +1,4 @@
-"""Adapter around the OFFICIAL RbA repo's own model-loading + scoring code
-(verbatim logic from RbA/evaluate_ood.py's get_model/get_RbA, read directly
-from https://github.com/NazirNayal8/RbA/blob/main/evaluate_ood.py -- not
-guessed), wrapped to match the same score(img, out_size) interface as our
-existing src/scoring/mask2former_rba.py, so it can drop into
-evaluate_rba_lost_and_found.py with minimal changes.
 
-Must be run with the RbA repo importable -- either run this script from
-inside /Volumes/BIggen/AV/external/RbA, or the RBA_REPO path below gets
-added to sys.path automatically.
-
-RbA score formula (confirmed from their own get_RbA(), not reconstructed):
-    logits = model(...)  # (19, H, W) per-class semantic logits
-    score = -logits.tanh().sum(dim=0)
-"See RbA paper: 'rejected by all' means every class's own confidence votes
-against a pixel; tanh squashes each class logit to [-1, 1] before summing so
-no single class can dominate."
-
-Known unverified risk points (flagging honestly rather than pretending
-certainty -- these are the things most likely to need a small fix if this
-errors on first run):
-  - default_setup() inside their setup() may try to write log files under
-    OUTPUT_DIR ("output/") relative to cwd -- run this from a writable dir.
-  - INPUT.FORMAT (RGB vs BGR) and whether images need to be resized before
-    being handed to the model are read from config.yaml at runtime below,
-    not assumed -- but if the config specifies a fixed training resolution
-    with a resize transform we're not replicating, scores may look worse
-    than the paper's numbers until that's matched.
-"""
 from __future__ import annotations
 import sys
 from pathlib import Path
