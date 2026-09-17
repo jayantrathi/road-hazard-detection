@@ -1,8 +1,4 @@
-"""Evaluate the trained DeepLabV3 anomaly segmenter on held-out Lost & Found,
-road-region protocol: positives = hazard pixels (trainId 2), negatives =
-drivable road (trainId 1), everything else excluded. Scene-level split, no
-leakage. Directly comparable to the downloaded-checkpoint baseline.
-"""
+
 from __future__ import annotations
 
 import argparse
