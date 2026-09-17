@@ -1,18 +1,4 @@
-"""Depth-gated anomaly detection, with ablation.
 
-Appearance-only anomaly scores false-fire on flat road markings and manholes.
-Penalizing the anomaly on near-coplanar pixels (low height above the fitted
-road plane) removes those false positives while keeping protruding obstacles,
-which improves ROI AUPR and FPR95.
-
-The held-out test frames are split by scene into tune/report (no scene in
-both); the gate (kappa, h0) is tuned on tune scenes and appearance-only vs
-depth-gated is reported on report scenes. The road mask for the plane fit
-comes from the segmenter's own argmax, never from labels.
-
-    --mode official   score with the downloaded RbA checkpoint
-    --mode trained    score with the trained DeepLabV3
-"""
 from __future__ import annotations
 
 import argparse
