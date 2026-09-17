@@ -1,14 +1,4 @@
-"""Pixel-level RoadAnomaly21 evaluation for the RbA-style scorers (trained
-DeepLabV3 or the downloaded checkpoint baseline).
 
-Separate from evaluate_roadanomaly21.py (which scores the older kNN patch bank).
-RoadAnomaly21's anomalies appear anywhere in the frame, not just the road, so
-it's a harder cross-dataset generalization test than Lost & Found.
-
-Labels (SegmentMeIfYouCan): 0 = in-distribution, 1 = anomaly, 255 = ignore.
-    python scripts/evaluate_roadanomaly21_trained.py --mode trained
-    python scripts/evaluate_roadanomaly21_trained.py --mode official
-"""
 from __future__ import annotations
 
 import argparse
