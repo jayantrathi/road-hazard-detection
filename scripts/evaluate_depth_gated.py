@@ -76,12 +76,10 @@ def main():
         gp = GroundPlaneHeight(fov_deg=args.fov)
     print("Depth source ready.\n")
 
-    # scene-level tune/report split (no scene in both)
     scenes = sorted({s for _, s, _ in frames})
-    tune_scenes = set(scenes[::2])  # every other scene -> tune
+    tune_scenes = set(scenes[::2])  
     print(f"{len(scenes)} scenes: {len(tune_scenes)} tune / {len(scenes)-len(tune_scenes)} report\n")
 
-    # precompute per-frame arrays once (scoring + depth are the expensive parts)
     cache = []
     for idx, (path, scene, is_hazard) in enumerate(frames):
         label_path = img_path_to_label_path(path)
@@ -114,7 +112,6 @@ def main():
     app_r, hgt_r, lab_r = pool(report_scenes)
     spread = float(np.percentile(app_t, 95) - np.percentile(app_t, 5))
 
-    # tune (kappa, h0) on tune scenes by ROI AUPR
     best = (-1, 0.0, 0.06)
     for kappa in [0.5, 1.0, 2.0, 3.0]:
         for h0 in [0.03, 0.06, 0.12, 0.25]:
@@ -130,7 +127,6 @@ def main():
     gated_scores = gate_scores(app_r, hgt_r, kappa, h0, spread)
     gated = summarize(gated_scores, lab_r)
 
-    # false positives specifically on ROAD (negatives) at 95% recall
     def road_fp(scores):
         return fpr_at_recall(scores, lab_r, 0.95)
 
