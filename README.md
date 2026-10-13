@@ -36,9 +36,13 @@ On the second benchmark, RoadAnomaly21, the AUPR drops to 0.37. That makes sense
 ## How it works
 
 1 Train a DeepLabV3-ResNet50 on Cityscapes, while adding random unknown objects into the scenes so the model learns to be less confident when it sees something unfamiliar.
+
 2 Give each pixel an anomaly score based on how poorly it matches any of the known classes.
+
 3 Only look for anomalies inside the predicted drivable road area, while ignoring the vehicle and its parts (hood on most dashcams).
+
 4 Depth gate — estimate the 3D plane of the road and filter out things that are basically flat with the road, like paint or manhole covers. Objects that actually stick up from the road are kept since they are more likely to be real hazards.
+
 5 Draw boxes around the remaining detections so the final hazards are easy to see.
 
 ![depth gate](docs/images/result_markings.jpg)
