@@ -2,7 +2,7 @@
 
 # Road-Hazard Corner-Case Detection
 
-Flagging unknown obstacles on the road — the debris, lost cargo, and animals a self-driving car's perception was never trained to recognize.
+Flagging unknown obstacles on the road like debris, lost cargo, and animals that a self-driving car's perception was never trained to recognize.
 
 ![hero](docs/images/hero_tricycle.jpg)
 
@@ -12,7 +12,7 @@ Flagging unknown obstacles on the road — the debris, lost cargo, and animals a
 
 ## About
 
-Most self-driving perception models are trained on a fixed set of classes — car, person, road, sign. Anything outside that set gets confidently mislabeled instead of flagged, which is a problem when the thing outside the set is a tire in your lane or a pothole left open.
+Most self-driving perception models are trained on a fixed set of classes like car, person, road, sign. Anything outside that set gets confidently mislabeled instead of flagged, which is a problem when the thing outside the set is a tire in your lane or a pothole left open.
 
 This is an anomaly detector for that gap. A segmentation network is trained to become *unconfident* on unfamiliar objects, so wherever it's unsure on the road, that's a likely hazard. A depth-based filter then removes false alarms from flat road markings and manhole covers. The whole model was trained from scratch, no cloud, no pretrained anomaly checkpoint.
 
@@ -41,9 +41,9 @@ On the second benchmark, RoadAnomaly21, the AUPR drops to 0.37. That makes sense
 
 3 - Only look for anomalies inside the predicted drivable road area, while ignoring the vehicle and its parts (hood on most dashcams). 
 
-4 - Depth gate — estimate the 3D plane of the road and filter out things that are basically flat with the road, like paint or manhole covers. Objects that actually stick up from the road are kept since they are more likely to be real hazards, where as things that are flush with the road, although unfamiliar, dont really pose any real danger.
+4 - Depth gates estimate the 3D plane of the road and filter out things that are basically flat with the road, like paint or manhole covers. Objects that actually stick up from the road are kept since they are more likely to be real hazards, where as things that are flush with the road, although unfamiliar, dont really pose any real danger.
 
-5 - Draw boxes around the remaining detections so the final hazards are easy to see.
+5 - Draws boxes around the remaining detections so the final hazards are easy to see.
 
 ![depth gate](docs/images/result_markings.jpg)
 
